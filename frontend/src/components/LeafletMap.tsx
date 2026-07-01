@@ -56,7 +56,7 @@ const ChangeView: React.FC<{ center: [number, number]; zoom: number }> = ({ cent
 };
 
 // Inner component that has access to the map instance for panning
-const LocateControl: React.FC<{ userLocation: [number, number] | null }> = ({ userLocation }) => {
+const LocateControl: React.FC = () => {
   const map = useMap();
   const handleLocate = () => {
     if (!navigator.geolocation) {
@@ -161,7 +161,7 @@ export const LeafletMap: React.FC<MapProps> = ({ viewMode, alerts = [], feedback
         />
 
         {/* My Location Button */}
-        <LocateControl userLocation={userLocation} />
+        <LocateControl />
 
         {/* User's Current Location - Blue Pulsing Dot */}
         {userLocation && (
