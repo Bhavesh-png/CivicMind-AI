@@ -26,16 +26,8 @@ RUN echo 'server { \
         index index.html index.htm; \
         try_files $$uri $$uri/ /index.html; \
     } \
-    # proxy API requests to backend in production if needed \
-    location /api/v1/ { \
-        proxy_pass http://backend:8000/api/v1/; \
-        proxy_http_version 1.1; \
-        proxy_set_header Upgrade $$http_upgrade; \
-        proxy_set_header Connection "upgrade"; \
-        proxy_set_header Host $$host; \
-        proxy_cache_bypass $$http_upgrade; \
-    } \
 }' > /etc/nginx/conf.d/default.conf
+
 
 EXPOSE 80
 
