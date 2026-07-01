@@ -39,4 +39,6 @@ RUN echo 'server { \
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# Start Nginx with dynamic port substitution for Cloud Run
+CMD ["sh", "-c", "sed -i \"s/listen 80;/listen ${PORT:-80};/g\" /etc/nginx/conf.d/default.conf && exec nginx -g \"daemon off;\""]
+
