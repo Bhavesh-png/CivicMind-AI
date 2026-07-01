@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/* Leaflet maps styling imports */
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  --color-brand-50: hsl(210, 100%, 98%);
+  --color-brand-100: hsl(210, 100%, 95%);
+  --color-brand-500: hsl(217, 91%, 60%);
+  --color-brand-600: hsl(217, 91%, 50%);
+  --color-brand-700: hsl(217, 91%, 40%);
+  
+  --color-success-50: hsl(150, 100%, 98%);
+  --color-success-500: hsl(150, 84%, 37%);
+  
+  --color-warning-50: hsl(35, 100%, 98%);
+  --color-warning-500: hsl(35, 90%, 50%);
+  
+  --color-danger-50: hsl(0, 100%, 98%);
+  --color-danger-500: hsl(0, 84%, 60%);
+}
+
+:root {
+  /* HSL Color System for Glassmorphism & Light Mode */
+  --bg-primary: 0 0% 100%;
+  --bg-secondary: 210 30% 98%; /* Slightly cooler gray background */
+  --text-main: 215 28% 17%;
+  --text-muted: 215 16% 40%;
+  --border-color: 214 32% 91%;
+  
+  /* High contrast, premium light mode cards */
+  --card-bg: rgba(255, 255, 255, 0.90);
+  --card-border: rgba(203, 213, 225, 0.85); /* Clearly visible border in light mode */
+  --glass-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 16px -6px rgba(0, 0, 0, 0.03);
+  --glass-backdrop: blur(20px);
+  
+  --sidebar-width: 260px;
+}
+
+.dark {
+  /* HSL Color System for Dark Mode */
+  --bg-primary: 222 47% 11%;
+  --bg-secondary: 222 47% 6%;
+  --text-main: 210 40% 98%;
+  --text-muted: 215 20% 65%;
+  --border-color: 217 32% 17%;
+  
+  --card-bg: rgba(15, 23, 42, 0.75);
+  --card-border: rgba(51, 65, 85, 0.5);
+  --glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  --glass-backdrop: blur(20px);
+}
+
+
+body {
+  background-color: hsl(var(--bg-secondary));
+  color: hsl(var(--text-main));
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Styles */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-backdrop);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 1rem;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08), 0 10px 20px -10px rgba(0, 0, 0, 0.04);
+}
+
+.dark .glass-card:hover {
+  box-shadow: 0 25px 45px -15px rgba(0, 0, 0, 0.6);
+}
+
+
+/* Interactive Sidebar Transition */
+.sidebar-transition {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Custom Gradients */
+.gradient-primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+}
+
+.gradient-ai {
+  background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
+}
+
+/* Pulse animation for active alert indicators */
+@keyframes alert-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+.alert-indicator {
+  animation: alert-pulse 2s infinite ease-in-out;
+}
+
+/* Leaflet maps custom dark-mode styling override */
+.dark .leaflet-tile {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.leaflet-container {
+  border-radius: 0.75rem;
+  z-index: 10;
+}
