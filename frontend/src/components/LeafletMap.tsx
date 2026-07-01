@@ -55,9 +55,41 @@ const ChangeView: React.FC<{ center: [number, number]; zoom: number }> = ({ cent
   return null;
 };
 
+// Inner component that has access to the map instance for panning
+const LocateControl: React.FC<{ userLocation: [number, number] | null }> = ({ userLocation }) => {
+  const map = useMap();
+  const handleLocate = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        map.flyTo(coords, 15, { animate: true, duration: 1.5 });
+      },
+      () => alert('Location access denied. Please enable location permissions in your browser.')
+    );
+  };
+  return (
+    <div
+      onClick={handleLocate}
+      title="Go to my location"
+      style={{
+        position: 'absolute', bottom: '80px', right: '10px', zIndex: 1000,
+        background: 'white', border: '2px solid rgba(0,0,0,0.2)', borderRadius: '4px',
+        padding: '5px 8px', cursor: 'pointer', fontSize: '18px', boxShadow: '0 1px 5px rgba(0,0,0,0.3)',
+        userSelect: 'none'
+      }}
+    >📍</div>
+  );
+};
+
 export const LeafletMap: React.FC<MapProps> = ({ viewMode, alerts = [], feedback = [] }) => {
   const [streets, setStreets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Fetch coordinates for routes from the backend api
   useEffect(() => {
@@ -72,6 +104,20 @@ export const LeafletMap: React.FC<MapProps> = ({ viewMode, alerts = [], feedback
       }
     };
     fetchRoutes();
+  }, []);
+
+  // Auto-detect user location on mount
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+        setLocationError(null);
+      },
+      () => setLocationError('Location access denied'),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
   // Mock hospitals dataset
@@ -96,6 +142,11 @@ export const LeafletMap: React.FC<MapProps> = ({ viewMode, alerts = [], feedback
           Loading city coordinates...
         </div>
       )}
+      {locationError && (
+        <div className="absolute top-2 left-2 z-50 bg-amber-50 border border-amber-300 text-amber-700 text-xs px-3 py-1.5 rounded-lg shadow">
+          ⚠️ {locationError} — map centered on Mumbai
+        </div>
+      )}
       <MapContainer
         center={[LAT_CENTER, LON_CENTER]}
         zoom={13}
@@ -108,6 +159,36 @@ export const LeafletMap: React.FC<MapProps> = ({ viewMode, alerts = [], feedback
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        {/* My Location Button */}
+        <LocateControl userLocation={userLocation} />
+
+        {/* User's Current Location - Blue Pulsing Dot */}
+        {userLocation && (
+          <>
+            {/* Outer pulse ring */}
+            <CircleMarker
+              center={userLocation}
+              radius={18}
+              pathOptions={{ fillColor: '#3B82F6', color: '#3B82F6', fillOpacity: 0.15, weight: 1 }}
+            />
+            {/* Inner solid dot */}
+            <CircleMarker
+              center={userLocation}
+              radius={8}
+              pathOptions={{ fillColor: '#2563EB', color: '#ffffff', fillOpacity: 1, weight: 2 }}
+            >
+              <Popup>
+                <div className="text-xs p-1">
+                  <p className="font-bold text-blue-700">📍 You are here</p>
+                  <p className="text-slate-500 mt-0.5">
+                    {userLocation[0].toFixed(5)}, {userLocation[1].toFixed(5)}
+                  </p>
+                </div>
+              </Popup>
+            </CircleMarker>
+          </>
+        )}
 
         {/* 1. Traffic Layer - render route polylines */}
         {viewMode === 'traffic' && streets.map((street, idx) => (
