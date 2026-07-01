@@ -18,5 +18,6 @@ COPY . .
 # Expose FastAPI default port
 EXPOSE 8000
 
-# Command to run on container start
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run on container start (supports dynamic port binding in Cloud Run)
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+
